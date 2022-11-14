@@ -6,6 +6,7 @@ var userHelper=require('../helpers/user-helpers')
 var paypal = require('paypal-rest-sdk');
 const { Db } = require('mongodb');
 require('dotenv').config()
+var Handlebars = require('handlebars');
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;    
 const authToken = process.env.TWILIO_AUTH_TOKEN;      
@@ -27,21 +28,43 @@ const verifyUserLogin=(req,res,next)=>{
   }
 }
 
-router.get('/',(req,res)=>{
+router.get('/',async(req,res)=>{
   let cartCount=null
+  const perPage = 2;
+  let pageNum;
+  let skip;
+  let productCount;
+  let pages;
+  pageNum = parseInt(req.query.page);
+  console.log(typeof (pageNum))
+  skip = (pageNum - 1) * perPage
+  await productHelper.getProductCount().then((count) => {
+    productCount = count;
+  })
+  pages = Math.ceil(productCount / perPage)
+
+  Handlebars.registerHelper('ifCond', function (v1, v2, options) {
+    if (v1 === v2) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+  Handlebars.registerHelper('for', function (from, to, incr, block) {
+    var accum = '';
+    for (var i = from; i <= to; i += incr)
+      accum += block.fn(i);
+    return accum;
+  });
 
   productHelper.getAllCategory().then(async(AllCategory)=>{
-
-    if (req.session.user) {    
-      cartCount=await userHelper.getCartCount(req.session.user._id)
-      productHelper.getAllProduct().then((products)=>{
-        res.render('user/index',{profile:true,products,AllCategory,cartCount})
-      })
-    } else {
-      productHelper.getAllProduct().then((products)=>{
-        res.render('user/index',{products,AllCategory})
-      })
-    }  
+    await productHelper.getPaginatedProducts(skip, perPage).then(async(products) => {
+      if (req.session.user) {    
+        cartCount=await userHelper.getCartCount(req.session.user._id)
+          res.render('user/index',{profile:true,products,AllCategory,cartCount,totalDoc: productCount, currentPage: pageNum, pages: pages})
+      } else {
+          res.render('user/index',{products,AllCategory,totalDoc: productCount, currentPage: pageNum, pages: pages})
+      } 
+    }) 
   })
 
 })

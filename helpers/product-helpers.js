@@ -213,6 +213,17 @@ module.exports={
                 resolve(products)
             })
         })
-    }
-
+    },
+    getProductCount:()=>{
+        return new Promise(async (resolve, reject) => {
+            let count = await db.get().collection("products").countDocuments()
+            resolve(count)
+        })
+    },
+    getPaginatedProducts: (skip, limit) => {
+        return new Promise(async (resolve, reject) => {
+            let products = await db.get().collection("products").find().skip(skip).limit(limit).toArray()
+            resolve(products.reverse())
+        })
+    },
 }

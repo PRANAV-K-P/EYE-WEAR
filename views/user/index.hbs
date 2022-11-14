@@ -31,11 +31,28 @@
           </div>
 		  </a>
         </div>
-		
       </div>
-
       {{/each}}
     </div>
+	<div class="row mt-5">
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+				<li class="page-item">
+					<a class="page-link" href="#" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+				{{#for 1 pages 1}}
+				<li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" href="/?page={{this}}">{{this}}</a></li>
+				{{/for}}
+				<li class="page-item">
+					<a class="page-link" href="#" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
   </div>
 </section>
 
@@ -45,10 +62,6 @@
 
 </div>
 </section>
-
-</section>
-
-
 
 <footer class="footer-03">
 			<div class="container">
