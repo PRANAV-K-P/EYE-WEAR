@@ -3,46 +3,61 @@
     <div class="container-fluid px-5  ">
     
     <div class="table-responsive ">
-        <table class="table shadow-lg" id="myorders">
-  <thead class=" fw-bold fs-5 ">
-    <tr>
-      <th></th>
-       <th scope="col" class="">Date</th>
-      <th scope="col" class="">Amount</th>
-      <th scope="col" class="">Payment</th>
-      <th scope="col" class="">Status</th>
-      <th>Options</th>
-    </tr>
-  </thead>
-  <tbody class="fw-bold fs-7">
-    {{#each order}}
-    <tr>
-      <td id="slNo"></td>
-      <td>{{this.date}}</td>
-        <td ><span class="productprice">{{this.totalAmount}}</span></td>
-        <td>{{this.paymentMethod}}</td>
-        <td id="{{this._id}}" class="statusValue">{{this.status}}</td>
-        <td><a href="/view-order-products/{{this._id}}" class="btn btn-dark text-white border-0 btn-dark-blue" >View </a>
-          <button class="btn text-danger border border-danger cancelBtn" 
-          style="display: none;"
-          onclick="orderCancel('{{this._id}}','{{this.totalAmount}}')">Cancel</button>
+      <table class="table shadow-lg" id="myorders">
+        <thead class=" fw-bold fs-5 ">
+          <tr>
+            <th></th>
+             <th scope="col" class="">Date</th>
+            <th scope="col" class="">Amount</th>
+            <th scope="col" class="">Payment</th>
+            <th scope="col" class="">Status</th>
+            <th>Options</th>
+          </tr>
+        </thead>
+        <tbody class="fw-bold fs-7">
+          {{#each order}}
+          <tr>
+            <td id="slNo"></td>
+            <td>{{this.date}}</td>
+              <td ><span class="productprice">{{this.totalAmount}}</span></td>
+              <td>{{this.paymentMethod}}</td>
+              <td id="{{this._id}}" class="statusValue">{{this.status}}</td>
+              <td><a href="/view-order-products/{{this._id}}" class="btn btn-dark text-white border-0 btn-dark-blue" >View </a>
+                <button class="btn text-danger border border-danger cancelBtn" 
+                style="display: none;"
+                onclick="orderCancel('{{this._id}}','{{this.totalAmount}}')">Cancel</button>
 
+                <button class="btn text-danger border border-danger returnBtn" 
+                style="display: none;"
+                onclick="orderReturn('{{this._id}}','{{this.totalAmount}}')">Return</button>
+              </td>
+          </tr>
+          {{/each}}
 
-
-          <button class="btn text-danger border border-danger returnBtn" 
-          style="display: none;"
-          onclick="orderReturn('{{this._id}}','{{this.totalAmount}}')">Return</button>
-
-        </td>
-    </tr>
-    
-
-    {{/each}}
-    
-  </tbody>
-</table>
-</div>
+        </tbody>
+      </table>
     </div>
+    <div class="row mt-3">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {{#for 1 pages 1}}
+          <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" 
+          href="/view-orders/?page={{this}}">{{this}}</a></li>
+          {{/for}}
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+	  </div>
+  </div>
 </section>
 
 <script>
@@ -50,11 +65,6 @@
     for (var i = 0; i < divs.length; ++i) {
         divs[i].innerHTML = i + 1;
     }
-
-    $(document).ready( function () {
-    $('#myorders').DataTable();
-    } );
-
     var price = document.getElementsByClassName("productprice")
       console.log(price)
         for (let i = 0; i < price.length; i++) {
@@ -62,9 +72,6 @@
             tempPrice = `₹${tempPrice.toLocaleString('hi')}`
             price[i].innerHTML = tempPrice
         }
-
-
-
     let cancelBtn=document.querySelectorAll(".cancelBtn")
     let returnBtn=document.querySelectorAll(".returnBtn")
     let statusValue=document.querySelectorAll(".statusValue")

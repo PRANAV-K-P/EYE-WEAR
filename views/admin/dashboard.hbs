@@ -173,6 +173,25 @@
                </table>
                </div>
               </div>
+              <div class="row mt-1">
+                <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                    <li class="page-item">
+                      <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                    {{#for 1 pages 1}}
+                    <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" href="/admin/dashboard/?page={{this}}">{{this}}</a></li>
+                    {{/for}}
+                    <li class="page-item">
+                      <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+	            </div>
             </div>
           </div>
         </div>
@@ -201,9 +220,6 @@
             tempPrice = `₹${tempPrice.toLocaleString('hi')}`
             price[i].innerHTML = tempPrice
         }
-  $(document).ready( function () {
-  $('#orderlist').DataTable();
-  } );
    document.getElementById('excelExport').addEventListener('click', function(){
         TableToExcel.convert(document.getElementById("tableSalesReport"), {
           name: "file.xlsx",

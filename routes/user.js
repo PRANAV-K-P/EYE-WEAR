@@ -30,13 +30,12 @@ const verifyUserLogin=(req,res,next)=>{
 
 router.get('/',async(req,res)=>{
   let cartCount=null
-  const perPage = 2;
+  const perPage = 8;
   let pageNum;
   let skip;
   let productCount;
   let pages;
   pageNum = parseInt(req.query.page);
-  console.log(typeof (pageNum))
   skip = (pageNum - 1) * perPage
   await productHelper.getProductCount().then((count) => {
     productCount = count;
@@ -60,9 +59,9 @@ router.get('/',async(req,res)=>{
     await productHelper.getPaginatedProducts(skip, perPage).then(async(products) => {
       if (req.session.user) {    
         cartCount=await userHelper.getCartCount(req.session.user._id)
-          res.render('user/index',{profile:true,products,AllCategory,cartCount,totalDoc: productCount, currentPage: pageNum, pages: pages})
+          res.render('user/index',{profile:true,products,AllCategory,cartCount,currentPage: pageNum, pages: pages})
       } else {
-          res.render('user/index',{products,AllCategory,totalDoc: productCount, currentPage: pageNum, pages: pages})
+          res.render('user/index',{products,AllCategory,currentPage: pageNum, pages: pages})
       } 
     }) 
   })
@@ -169,17 +168,41 @@ router.get('/productdetails/:id',(req,res)=>{
   })
 })
 
-router.get('/category/:cat',(req,res)=>{
+router.get('/category/:cat',async(req,res)=>{
   let cartCount=null
+  catName=req.params.cat
+  const perPage = 8;
+  let pageNum;
+  let skip;
+  let catProductCount;
+  let pages;
+  pageNum = parseInt(req.query.page);
+  skip = (pageNum - 1) * perPage
+  await productHelper.getCategoryProductCount(catName).then((count) => {
+    catProductCount = count;
+  })
+  pages = Math.ceil(catProductCount / perPage)
+  Handlebars.registerHelper('ifCond', function (v1, v2, options) {
+    if (v1 === v2) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+  Handlebars.registerHelper('for', function (from, to, incr, block) {
+    var accum = '';
+    for (var i = from; i <= to; i += incr)
+      accum += block.fn(i);
+    return accum;
+  });
   productHelper.getAllCategory().then(async(AllCategory)=>{
   if (req.session.user) {
     cartCount=await userHelper.getCartCount(req.session.user._id)
-    productHelper.getProductsInCategory(req.params.cat).then((products)=>{
-      res.render('user/category',{profile:true,products,AllCategory,cartCount})
+    productHelper.getProductsInCategory(catName,skip,perPage).then((products)=>{
+      res.render('user/category',{profile:true,products,AllCategory,cartCount,catName,currentPage: pageNum, pages: pages})
     })
   } else {
-    productHelper.getProductsInCategory(req.params.cat).then((products)=>{
-      res.render('user/category',{products,AllCategory})
+    productHelper.getProductsInCategory(catName,skip,perPage).then((products)=>{
+      res.render('user/category',{products,AllCategory,catName,currentPage: pageNum, pages: pages})
     })
   }
 })
@@ -457,12 +480,35 @@ router.get('/status-page',verifyUserLogin,(req,res)=>{
   }else{
     res.redirect('/')
   }
-   
 })
-router.get('/view-orders',verifyUserLogin,(req,res)=>{
+router.get('/view-orders',verifyUserLogin,async(req,res)=>{
+  let userId=req.session.user._id
+  const perPage = 6;
+  let pageNum;
+  let skip;
+  let productCount;
+  let pages;
+  pageNum = parseInt(req.query.page);
+  skip = (pageNum - 1) * perPage
+  await userHelper.getOrderCountOfSingleUser(userId).then((count) => {
+    productCount = count;
+  })
+  pages = Math.ceil(productCount / perPage)
+  Handlebars.registerHelper('ifCond', function (v1, v2, options) {
+    if (v1 === v2) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+  Handlebars.registerHelper('for', function (from, to, incr, block) {
+    var accum = '';
+    for (var i = from; i <= to; i += incr)
+      accum += block.fn(i);
+    return accum;
+  });
   productHelper.getAllCategory().then(async(AllCategory)=>{
-      userHelper.getOrders(req.session.user._id).then(async(order)=>{
-        res.render('user/view-orders',{profile:true,order,AllCategory})
+      userHelper.getSingleUserOrders(userId,skip,perPage).then(async(order)=>{
+        res.render('user/view-orders',{profile:true,order,AllCategory,currentPage: pageNum, pages: pages})
       })
   })
 })
@@ -508,7 +554,6 @@ router.get('/view-order-products/:id',verifyUserLogin,async(req,res)=>{
     returned
   })
 })
-
 router.post('/order-return',(req,res)=>{
   let userId=req.session.user._id
   userHelper.returnOrder(req.body,userId).then(async(response)=>{
@@ -529,7 +574,6 @@ router.post('/order-cancel',(req,res)=>{
     res.json(response)
   })
 })
-
 router.post('/verify-payment',(req,res)=>{
   userHelper.verifyPayment(req.body).then(()=>{
     userHelper.changeOnlinePaymentStatus(req.body['order[receipt]']).then(()=>{
@@ -542,9 +586,6 @@ router.post('/verify-payment',(req,res)=>{
     res.json({status:false,errMsg:''})
   })
 })
-
-
-
 router.get('/profile',verifyUserLogin,(req,res)=>{
   productHelper.getAllCategory().then(async(AllCategory)=>{
       userId=req.session.user._id
@@ -554,7 +595,6 @@ router.get('/profile',verifyUserLogin,(req,res)=>{
         res.render('user/profile',{AllCategory,profile:true,singleUser,referralCode})
       })
   })
-  
 })
 router.post('/profile',(req,res)=>{
   userId=req.session.user._id
@@ -573,7 +613,6 @@ router.get('/change-password',verifyUserLogin,(req,res)=>{
       req.session.passwordExist=null
       req.session.passwordErr=null
   })
-  
 })
 router.post('/change-password',(req,res)=>{
   userId=req.session.user._id
@@ -592,14 +631,12 @@ router.post('/change-password',(req,res)=>{
     }
   })
 })
-
 router.post('/paypal-status',(req,res)=>{
   userHelper.changeOnlinePaymentStatus(req.body.order).then(()=>{
     req.session.paymentStatus=true
     res.json({status:true})
   })
 })
-
 router.get('/manage-addresses',verifyUserLogin,(req,res)=>{
   productHelper.getAllCategory().then(async(AllCategory)=>{
       userId=req.session.user._id
@@ -611,7 +648,6 @@ router.get('/manage-addresses',verifyUserLogin,(req,res)=>{
       })
         
   })
-  
 })
 router.post('/manage-addresses',(req,res)=>{
   userId=req.session.user._id
@@ -641,7 +677,6 @@ router.post('/coupon-verify',(req,res)=>{
       req.session.coupon=response
       let couponAmount=response.minAmount
       let perc=response.percentage
-      
       if(req.session.buynow){
         totalAmount=await userHelper.getTotalOfOneProduct(userId,proId)
       }else{
@@ -691,7 +726,6 @@ router.post('/edit-Address-order',(req,res)=>{
     res.redirect('/place-order')
   })
 })
-
 router.get('/search',(req,res)=>{
   let key=req.query.search
   productHelper.getAllCategory().then(async(AllCategory)=>{
@@ -708,8 +742,6 @@ router.get('/search',(req,res)=>{
     }
   }) 
 })
-
-
 
 router.get('/userlogout',(req,res)=>{
   req.session.user=null

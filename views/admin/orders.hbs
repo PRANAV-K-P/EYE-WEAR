@@ -2,41 +2,61 @@
     <div class="container ">
       <div class="table-responsive">
         <table class="table shadow-lg mt-2 fw-bold" id="orderslist">
-  <thead>
-    <tr>
-      <th></th>
-       <th scope="col" class="">Date</th>
-      <th scope="col" class="">Amount</th>
-      <th scope="col" class="">Payment</th>
-      <th scope="col" class="">Status</th>
-      <th>Options</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each order}}
-    <tr>
-      <td id="slNo"></td>
-      <td>{{this.date}}</td>
-        <td>{{this.totalAmount}}</td>
-        <td>{{this.paymentMethod}}</td>
-        <td>
-        <select class="form-select selectTagValue" name="status" id="{{this._id}}" style="display: none;">
-          <option value={{this.status}}  selected>{{this.status}}</option>
-          <option value="" class="cancelled" >Cancelled</option>
-          <option value="" class="placed" style="display: none;">Placed</option> 
-          <option value="" class="shipped" >Shipped</option>
-          <option value="" class="delivered" >Delivered</option>
-        </select>
-        <span class="spanStatus" style="display:none;">{{this.status}}</span>
-      </td>
-        <td><button class="btn text-white bg-dark border-0 save" style="display: none;" onclick="changestatus('{{this._id}}')">SAVE</button></td>
-        <td><a href="/admin/single-order-details/{{this._id}}" class="btn text-white bg-info border-0" >Details</a></td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
-</div>
+          <thead>
+            <tr>
+              <th></th>
+              <th scope="col" class="">Date</th>
+              <th scope="col" class="">Amount</th>
+              <th scope="col" class="">Payment</th>
+              <th scope="col" class="">Status</th>
+              <th>Options</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each order}}
+            <tr>
+              <td id="slNo"></td>
+              <td>{{this.date}}</td>
+                <td>{{this.totalAmount}}</td>
+                <td>{{this.paymentMethod}}</td>
+                <td>
+                <select class="form-select selectTagValue" name="status" id="{{this._id}}" style="display: none;">
+                  <option value={{this.status}}  selected>{{this.status}}</option>
+                  <option value="" class="cancelled" >Cancelled</option>
+                  <option value="" class="placed" style="display: none;">Placed</option> 
+                  <option value="" class="shipped" >Shipped</option>
+                  <option value="" class="delivered" >Delivered</option>
+                </select>
+                <span class="spanStatus" style="display:none;">{{this.status}}</span>
+              </td>
+                <td><button class="btn text-white bg-dark border-0 save" style="display: none;" onclick="changestatus('{{this._id}}')">SAVE</button></td>
+                <td><a href="/admin/single-order-details/{{this._id}}" class="btn text-white bg-info border-0" >Details</a></td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div class="row mt-4">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            {{#for 1 pages 1}}
+            <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" 
+            href="/admin/orders/?page={{this}}">{{this}}</a></li>
+            {{/for}}
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+	    </div>
     </div>
 </section>
 
@@ -45,11 +65,6 @@
     for (var i = 0; i < divs.length; ++i) {
         divs[i].innerHTML = i + 1;
     }
-
-    $(document).ready( function () {
-    $('#orderslist').DataTable();
-    } );
-
     let save=document.querySelectorAll(".save")
     let selectTag=document.querySelectorAll(".selectTagValue")
     let spanStatus=document.querySelectorAll(".spanStatus")

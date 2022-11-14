@@ -2,38 +2,56 @@
     <div class="container">
       <div class="table-responsive">
         <table class="table bg-white shadow-lg mt-3 fw-bold" id="userslist"> 
-  <thead>
-    <tr>
-      <th></th>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Option</th>
-      <th scope="col">Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each users}}
-    <tr>
-      <td id="slNo"></td>
-      <td>{{this.name}}</td>
-      <td>{{this.email}}</td>
-      {{#if this.isBlocked}}     
-      <td>
-        <button class="btn btn-warning" onclick="toUnblock('{{this._id}}','{{this.name}}')">unblock</button>
-      </td>
-      <td>Inactive</td>
-      {{else}}
-      <td>
-        <button class="btn btn-info" onclick="toBlock('{{this._id}}','{{this.name}}')">block</button>
-      </td>
-      <td>Active</td>
-      {{/if}}      
-      
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
-</div>
+          <thead>
+            <tr>
+              <th></th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Option</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each users}}
+            <tr>
+              <td id="slNo"></td>
+              <td>{{this.name}}</td>
+              <td>{{this.email}}</td>
+              {{#if this.isBlocked}}     
+              <td>
+                <button class="btn btn-warning" onclick="toUnblock('{{this._id}}','{{this.name}}')">unblock</button>
+              </td>
+              <td>Inactive</td>
+              {{else}}
+              <td>
+                <button class="btn btn-info" onclick="toBlock('{{this._id}}','{{this.name}}')">block</button>
+              </td>
+              <td>Active</td>
+              {{/if}}      
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <div class="row mt-4">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            {{#for 1 pages 1}}
+            <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" href="/admin/view-users/?page={{this}}">{{this}}</a></li>
+            {{/for}}
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
 </section>
 
@@ -42,10 +60,6 @@
     for (var i = 0; i < divs.length; ++i) {
         divs[i].innerHTML = i + 1;
     }
-
-    $(document).ready( function () {
-    $('#userslist').DataTable();
-    } );
 
     function toBlock(userId,userName){
       Swal.fire({

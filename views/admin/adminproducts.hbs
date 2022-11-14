@@ -1,42 +1,60 @@
 <section class="admin-section bg-white pt-4" >
-    <div class="container">
-      <div class="">
+  <div class="container">
+    <div class="">
       <a href="/admin/add-products" class="btn btn-funky-moon">Add products</a>
     </div>
     <div class="table-responsive">
-        <table class="table bg-white shadow-lg fw-bold" id="Productlist"> 
-  <thead>
-    <tr>
-      <th class=""></th>
-      <th scope="col" class="">Image</th>
-      <th scope="col" class="">Model No.</th>
-      <th scope="col" class="">Brand</th>
-      <th scope="col" class="">Price</th>
-      <th scope="col" class="">Category</th>
-      <th class="">Options</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each products}}
-    <tr>
-      <td id="slNo"></td>
-      <td><img src="/product-images/{{this.image1}}"  style="width: 4rem; height:4rem;" alt=""> </td>
-      <td>{{this.model}}</td>
-      <td>{{this.brand}}</td>
-      <td>{{this.price}} </td>
-      <td>{{this.category}}</td>
-      <td>
-        <a href="/admin/product-data/{{this._id}}" class="btn btn-info">View</a>
-        <a href="/admin/edit-product/{{this._id}}" class="btn btn-primary">Edit</a>
-        <button class="btn btn-danger" onclick="deleteProduct('{{this.model}}','{{this._id}}')">Delete</a>
-      </td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+      <table class="table bg-white shadow-lg fw-bold" id="Productlist"> 
+        <thead>
+          <tr>
+            <th class=""></th>
+            <th scope="col" class="">Image</th>
+            <th scope="col" class="">Model No.</th>
+            <th scope="col" class="">Brand</th>
+            <th scope="col" class="">Price</th>
+            <th scope="col" class="">Category</th>
+            <th class="">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each products}}
+          <tr>
+            <td id="slNo"></td>
+            <td><img src="/product-images/{{this.image1}}"  style="width: 4rem; height:4rem;" alt=""> </td>
+            <td>{{this.model}}</td>
+            <td>{{this.brand}}</td>
+            <td>{{this.price}} </td>
+            <td>{{this.category}}</td>
+            <td>
+              <a href="/admin/product-data/{{this._id}}" class="btn btn-info">View</a>
+              <a href="/admin/edit-product/{{this._id}}" class="btn btn-primary">Edit</a>
+              <button class="btn btn-danger" onclick="deleteProduct('{{this.model}}','{{this._id}}')">Delete</button>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
     </div>
-
+    <div class="row mt-4">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {{#for 1 pages 1}}
+          <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" href="/admin/adminproducts/?page={{this}}">{{this}}</a></li>
+          {{/for}}
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
+  </div>
 </section>
 
 <script>
@@ -44,11 +62,6 @@
   for (var i = 0; i < divs.length; ++i) {
       divs[i].innerHTML = i + 1;
   }
-    
-
-  $(document).ready( function () {
-  $('#Productlist').DataTable();
-  } );
 
 function deleteProduct(proModel,proId){
   Swal.fire({

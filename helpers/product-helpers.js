@@ -1,5 +1,6 @@
 var db=require('../config/connection')
 var collection=require('../config/collections')
+const { log } = require('handlebars')
 // const { response } = require('../app')
 var ObjectId=require('mongodb').ObjectId
 module.exports={
@@ -23,18 +24,6 @@ module.exports={
                 }
                 
             }
-        })
-    },
-    getAllProduct:()=>{
-        return new Promise(async(resolve,reject)=>{
-            db.get().collection("products").find().toArray().then((products)=>{
-                try{
-                    resolve(products.reverse())
-                }catch(e){
-                    console.log(e)
-                    reject()
-                }
-            })
         })
     },
     deleteProduct:(proId)=>{
@@ -95,9 +84,9 @@ module.exports={
             })
         })
     },
-    getProductsInCategory:(cate)=>{
+    getProductsInCategory:(cate,skip,limit)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection("products").find({category:cate}).toArray().then((product)=>{
+            db.get().collection("products").find({category:cate}).skip(skip).limit(limit).toArray().then((product)=>{
                 console.log(product)
                 resolve(product.reverse())
             })
@@ -226,4 +215,12 @@ module.exports={
             resolve(products.reverse())
         })
     },
+    getCategoryProductCount:(catName)=>{
+        return new Promise(async (resolve, reject) => {
+            let procount = await db.get().collection("products").find({category:catName}).toArray()
+            count=procount.length
+            console.log(count);
+            resolve(count)
+        })
+    }
 }

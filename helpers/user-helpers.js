@@ -103,9 +103,9 @@ module.exports={
             }
         })
     },
-    getAllUsers:()=>{
+    getPaginatedUsers:(skip,limit)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection("users").find().toArray().then((users)=>{
+            db.get().collection("users").find().skip(skip).limit(limit).toArray().then((users)=>{
                 try{
                     console.log(users[0]._id);
                     resolve(users.reverse())
@@ -522,9 +522,9 @@ module.exports={
             })
         })
     },
-    getOrders:(userId)=>{
+    getSingleUserOrders:(userId,skip,limit)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection("order").find({userId:ObjectId(userId)}).toArray().then((order)=>{
+            db.get().collection("order").find({userId:ObjectId(userId)}).skip(skip).limit(limit).toArray().then((order)=>{
                 resolve(order.reverse())
             })
         })
@@ -568,13 +568,6 @@ module.exports={
                 console.log(e);
                 resolve({status:false})
             }  
-        })
-    },
-    getOrdersInAdmin:()=>{
-        return new Promise(async(resolve,reject)=>{
-            db.get().collection("order").find().toArray().then((order)=>{
-                resolve(order.reverse())
-            })
         })
     },
     changeOrderStatus:(details)=>{
@@ -1154,9 +1147,9 @@ module.exports={
             }
         })
     },
-    getCustomOrdersList:()=>{
+    getPaginatedCustomOrdersList:(skip,limit)=>{
         return new Promise(async (resolve, reject) => {
-            db.get().collection("order").find().toArray().then((order)=>{
+            db.get().collection("order").find().skip(skip).limit(limit).toArray().then((order)=>{
                 resolve(order.reverse())
             })
         })
@@ -1687,6 +1680,37 @@ module.exports={
                 console.log(e);
                 resolve()
             }
+        })
+    },
+    getOrderCount:()=>{
+        return new Promise(async (resolve, reject) => {
+            let count = await db.get().collection("order").countDocuments()
+            resolve(count)
+        })
+    },
+    getUserCount:()=>{
+        return new Promise(async (resolve, reject) => {
+            let count = await db.get().collection("users").countDocuments()
+            resolve(count)
+        })
+    },
+    getCouponCount:()=>{
+        return new Promise(async (resolve, reject) => {
+            let count = await db.get().collection("coupon").countDocuments()
+            resolve(count)
+        })
+    },
+    getPaginatedCoupon:(skip,limit)=>{
+        return new Promise(async (resolve, reject) => {
+            let coupons = await db.get().collection("coupon").find().skip(skip).limit(limit).toArray()
+            resolve(coupons.reverse())
+        })
+    },
+    getOrderCountOfSingleUser:(userid)=>{
+        return new Promise(async (resolve, reject) => {
+            let orderCount = await db.get().collection("order").find({userId:ObjectId(userid)}).toArray()
+            count=orderCount.length
+            resolve(count)
         })
     }
 }

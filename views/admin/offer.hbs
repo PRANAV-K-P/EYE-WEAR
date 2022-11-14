@@ -122,85 +122,104 @@
             </div>
 
             </div>
-            </form>
-        </div> 
+        </form>
+    </div> 
 
 {{!-- *********  Product offer table  ********* --}}
 
-<div class="col-xs-12 col-sm-12 col-md-12 justify-content-between shadow-lg bg-white">
-    <div class="table-responsive">
-        <table class="table bg-white shadow-lg fw-bold" id="productOfferList"> 
-            <thead>
-                <tr>
-                    <th class="">S.no</th>
-                    <th scope="col" class="">Name</th>
-                    <th scope="col" class="">Discount(%)</th>
-                    <th scope="col" class=""></th>
-                </tr>
-            </thead>
-            <tbody>
-            {{#each productOffer}}
-                <tr>
-                    <td id="slNo2"></td>
-                    <td>{{this.name}}</td>
-                    <td>{{this.percentage}}</td>
-                    <td ><button class="btn" onclick="removeProductOffer('{{this._id}}','{{this.name}}')"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
-                </tr>
-            {{/each}}
-            </tbody>
-        </table>
+    <div class="col-xs-12 col-sm-12 col-md-12 justify-content-between shadow-lg bg-white">
+        <div class="table-responsive">
+            <table class="table bg-white shadow-lg fw-bold" id="productOfferList"> 
+                <thead>
+                    <tr>
+                        <th class="">S.no</th>
+                        <th scope="col" class="">Name</th>
+                        <th scope="col" class="">Discount(%)</th>
+                        <th scope="col" class=""></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#each productOffer}}
+                    <tr>
+                        <td id="slNo2"></td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.percentage}}</td>
+                        <td ><button class="btn" onclick="removeProductOffer('{{this._id}}','{{this.name}}')"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
 {{!-- ************ product table to apply the offer ************* --}}
 
-<div class="col-xs-12 col-sm-12 col-md-12 justify-content-between shadow-lg mt-5 bg-white">
-    <div class="table-responsive">
-        <table class="table bg-white shadow-lg" id="productList"> 
-            <thead>
-                <tr>
-                <th scope="col" class=""></th>
-                <th scope="col" class="">Image</th>
-                <th scope="col" class="">Model No.</th>
-                <th scope="col" class="">Mrp</th>
-                <th scope="col" class="">Price</th>
-                <th scope="col" class="">Category</th>
-                <th scope="col" class="col-2">Offers</th>
-                <th scope="col" class=""></th>
-                 <th scope="col" class="col-2">Applied offer </th>
+    <div class="col-xs-12 col-sm-12 col-md-12 justify-content-between shadow-lg mt-5 bg-white">
+        <div class="table-responsive">
+            <table class="table bg-white shadow-lg" id="productList"> 
+                <thead>
+                    <tr>
+                    <th scope="col" class=""></th>
+                    <th scope="col" class="">Image</th>
+                    <th scope="col" class="">Model No.</th>
+                    <th scope="col" class="">Mrp</th>
+                    <th scope="col" class="">Price</th>
+                    <th scope="col" class="">Category</th>
+                    <th scope="col" class="col-2">Offers</th>
+                    <th scope="col" class=""></th>
+                    <th scope="col" class="col-2">Applied offer </th>
 
-               
-                </tr>
-            </thead>
-            <tbody>
-                 {{#each products}}
-                <tr>
-                    <td id="slNo3"></td>
-                    <td><img src="/product-images/{{this.image1}}"  style="width: 4rem; height:4rem;" alt=""> </td>
-                    <td>{{this.model}}</td>
-                    <td>{{this.mrp}}</td>
-                    <td>{{this.price}} </td>
-                    <td>{{this.category}}</td>
-                    <td>
-                        <select class="form-select w-75" name="category" id="{{this._id}}" aria-label="Default select example" required>
-                            <option selected></option>
-                            {{#each ../productOffer}}
-                                <option value="">{{this.name}}</option>
-                            {{/each}}
-                        </select>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger" onclick="applyProductOffer('{{this._id}}')">Save</button>
-                    </td>
-                    <td>{{#if this.offerName}}"{{this.offerName}}" - {{this.offerType}} offer {{/if}}</td>
+                
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                    <tr>
+                        <td id="slNo3"></td>
+                        <td><img src="/product-images/{{this.image1}}"  style="width: 4rem; height:4rem;" alt=""> </td>
+                        <td>{{this.model}}</td>
+                        <td>{{this.mrp}}</td>
+                        <td>{{this.price}} </td>
+                        <td>{{this.category}}</td>
+                        <td>
+                            <select class="form-select w-75" name="category" id="{{this._id}}" aria-label="Default select example" required>
+                                <option selected></option>
+                                {{#each ../productOffer}}
+                                    <option value="">{{this.name}}</option>
+                                {{/each}}
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" onclick="applyProductOffer('{{this._id}}')">Save</button>
+                        </td>
+                        <td>{{#if this.offerName}}"{{this.offerName}}" - {{this.offerType}} offer {{/if}}</td>
 
-                </tr>
-                 {{/each}}
-            </tbody>
-        </table>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-
+    <div class="col-12 mt-2">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            {{#for 1 pages 1}}
+            <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" 
+            href="/admin/offer/?page={{this}}">{{this}}</a></li>
+            {{/for}}
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+    </div>
  </div>
 </div>
 </section>
@@ -218,12 +237,6 @@
   for (var i = 0; i < divs.length; ++i) {
       divs[i].innerHTML = i + 1;
   }
-   $(document).ready( function () {
-  $('#categoryOfferList').DataTable();
-  $('#productOfferList').DataTable();
-  $('#productList').DataTable();
-  } );
-
     $("#createCategoryOffer").submit((e)=>{
         e.preventDefault()
          $.ajax({

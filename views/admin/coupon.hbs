@@ -38,36 +38,55 @@
             </form>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 d-flex justify-content-center shadow-lg mt-5">
-            
-              <div class="table-responsive bg-white w-75">
-                <h2 class="text-center">Coupons</h2>
-                  <table class="table bg-white shadow-lg mt-3 fw-bold" id="userslist"> 
-                    <thead>
-                      <tr>
-                        <th>S.no</th>
-                        <th scope="col" >Coupon</th>
-                        <th scope="col" >Description</th>
-                        <th scope="col" class="col-2">Min amount</th>
-                        <th scope="col" class="col-1">Percentage</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {{#each coupon}}
-                      <tr>
-                        <td id="slNo"></td>
-                        <td><span >{{this.couponName}}</span></td>
-                        <td>{{this.description}}</td>
-                        <td>{{this.minAmount}}</td>
-                        <td>{{this.percentage}}</td>
-                        <td ><button class="btn" onclick="removeCoupon('{{this._id}}','{{this.couponName}}')"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
-                      </tr>
-                      {{/each}}
-                    </tbody>
-                  </table>
-                  </div>
+          <div class="table-responsive bg-white w-75">
+            <h2 class="text-center">Coupons</h2>
+              <table class="table bg-white shadow-lg mt-3 fw-bold" id="userslist"> 
+                <thead>
+                  <tr>
+                    <th>S.no</th>
+                    <th scope="col" >Coupon</th>
+                    <th scope="col" >Description</th>
+                    <th scope="col" class="col-2">Min amount</th>
+                    <th scope="col" class="col-1">Percentage</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each coupon}}
+                  <tr>
+                    <td id="slNo"></td>
+                    <td><span >{{this.couponName}}</span></td>
+                    <td>{{this.description}}</td>
+                    <td>{{this.minAmount}}</td>
+                    <td>{{this.percentage}}</td>
+                    <td ><button class="btn" onclick="removeCoupon('{{this._id}}','{{this.couponName}}')"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
         </div>
-        </div>
+      </div>
+      <div class="row mt-2">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            {{#for 1 pages 1}}
+            <li class="page-item "><a class="page-link {{#ifCond this ../currentPage}} text-danger fw-bold {{/ifCond}}" 
+            href="/admin/coupon/?page={{this}}">{{this}}</a></li>
+            {{/for}}
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+	    </div>
     </div>
 </section>
 
