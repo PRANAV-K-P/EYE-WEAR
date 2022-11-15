@@ -245,7 +245,7 @@ module.exports={
                }
             }catch(e){
                 console.log(e)
-                resolve(null)
+                reject(e)
             } 
         })
     },

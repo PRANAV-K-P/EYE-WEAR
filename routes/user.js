@@ -7,6 +7,7 @@ var paypal = require('paypal-rest-sdk');
 const { Db } = require('mongodb');
 require('dotenv').config()
 var Handlebars = require('handlebars');
+const { route } = require('./admin');
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;    
 const authToken = process.env.TWILIO_AUTH_TOKEN;      
@@ -272,11 +273,18 @@ router.get('/cart',verifyUserLogin,async(req,res)=>{
         }else{
           res.render('user/cart',{profile:true,AllCategory})
         } 
-      }) 
+      })
+      .catch((e)=>{
+        res.redirect('/error')
+      })
   })
 })
 router.post('/cart',(req,res)=>{
   req.session.buynow=null
+  req.session.couponName=null
+  req.session.couponMsgGreen=null
+  req.session.newTotal=null
+  req.session.couponRemoveBtn=null
   res.redirect('/place-order')
 })
 router.get('/add-to-cart/:id',verifyUserLogin,(req,res)=>{
@@ -329,7 +337,11 @@ router.get('/place-order',verifyUserLogin,async(req,res)=>{
       products=await userHelper.getOneCartProduct(userId,proId)
       totalAmount=await userHelper.getTotalOfOneProduct(userId,proId)
     }else{
-      products=await userHelper.getCartProducts(userId)
+      try{
+        products=await userHelper.getCartProducts(userId)
+      }catch(e){
+        res.redirect('/error')
+      }
       totalAmount=await userHelper.getTotalAmount(userId)
     }
 
@@ -352,7 +364,8 @@ router.get('/place-order',verifyUserLogin,async(req,res)=>{
           percAmount=0
           oldTotal=0
         }
-
+        oldTotal=parseInt(oldTotal)
+        totalAmount=parseInt(totalAmount)
         res.render('user/userorder',{
           profile:true,
           products,
@@ -367,14 +380,17 @@ router.get('/place-order',verifyUserLogin,async(req,res)=>{
           couponMsgRed:req.session.couponMsgRed,
           notApplicable:req.session.coupenNotApplicable,
           percAmount,
-          oldTotal
+          oldTotal,
+          couponRemoveBtn:req.session.couponRemoveBtn
         })
-        req.session.couponMsgGreen=null
-        req.session.couponName=null
         req.session.couponMsgRed=null
         req.session.coupenNotApplicable=null
-        req.session.appliedPercentage=null
-        req.session.newTotal=null   
+        req.session.appliedPercentage=null  
+        if(req.session.removeCoupon===null){
+          req.session.newTotal=null
+          req.session.couponName=null
+          req.session.couponMsgGreen=null
+        } 
       }else{
         res.redirect('/')
         req.session.catchErr=null
@@ -405,11 +421,13 @@ router.post('/place-order',async(req,res)=>{
       req.session.paymentStatus=false
       if(req.body.paymentMethod==='COD'){
         req.session.newTotal=null
+        req.session.couponRemoveBtn=null
         req.session.paymentStatus=true
         res.json({codSuccess:true})
       }else if(req.body.paymentMethod==='WALLET'){
         await userHelper.reduceFromWallet(userId,totalPrice,orderId)
         req.session.newTotal=null
+        req.session.couponRemoveBtn=null
         req.session.paymentStatus=true
         res.json({walletSuccess:true})
       }
@@ -451,6 +469,7 @@ router.post('/place-order',async(req,res)=>{
                       transaction.orderId=orderId
                       console.log(payment)
                       req.session.newTotal=null
+                      req.session.couponRemoveBtn=null
                       res.json(transaction)
                        
                   }
@@ -466,6 +485,7 @@ router.post('/place-order',async(req,res)=>{
        userHelper.generateRazorpay(orderId,totalPrice).then((response)=>{
         response.razorpaysuccess=true
         req.session.newTotal=null
+        req.session.couponRemoveBtn=null
         res.json(response)
        })
     }
@@ -474,11 +494,11 @@ router.post('/place-order',async(req,res)=>{
 })
 
 router.get('/status-page',verifyUserLogin,(req,res)=>{
-  if(req.session.paymentStatus!=null){
+  if(req.session.paymentStatus===null ){
+    res.redirect('/')
+  }else{
     res.render('user/status-page',{profile:true,paymentStatus:req.session.paymentStatus})
     req.session.paymentStatus=null
-  }else{
-    res.redirect('/')
   }
 })
 router.get('/view-orders',verifyUserLogin,async(req,res)=>{
@@ -674,6 +694,8 @@ router.post('/coupon-verify',(req,res)=>{
   let proId=req.session.proId
   userHelper.verifyCoupon(coupon).then(async(response)=>{
     if(response.couponVerified){
+      req.session.removeCoupon=true
+      req.session.couponRemoveBtn=true
       req.session.coupon=response
       let couponAmount=response.minAmount
       let perc=response.percentage
@@ -691,10 +713,20 @@ router.post('/coupon-verify',(req,res)=>{
         req.session.percAmount=percAmount
         req.session.couponMsgGreen=" - Coupon Applied Successfully"
       }else{
+        req.session.removeCoupon=null
+        req.session.newTotal=null
+        req.session.couponName=null
+        req.session.couponMsgGreen=null
+        req.session.couponRemoveBtn=null
         req.session.coupenNotApplicable="Coupon is not applicable!"
       }
       res.json(response)
     }else{
+      req.session.removeCoupon=null
+      req.session.newTotal=null
+      req.session.couponName=null
+      req.session.couponMsgGreen=null
+      req.session.couponRemoveBtn=null
       req.session.couponMsgRed="Invalid Coupon !"
       res.json(response)
     }
@@ -741,6 +773,16 @@ router.get('/search',(req,res)=>{
       })
     }
   }) 
+})
+router.post('/removeCoupon',(req,res)=>{
+  let response={}
+  req.session.newTotal=null
+  req.session.removeCoupon=true
+  req.session.couponRemoveBtn=null
+  res.json(response)
+})
+router.get('/error',(req,res)=>{
+  res.render('user/user-error',{log:true})
 })
 
 router.get('/userlogout',(req,res)=>{

@@ -21,24 +21,24 @@
             <div class="text-success">
               <h6 class="my-0">Coupon</h6>
             </div>
-            <span>-<span class="text-success productprice">{{percAmount}}</span></span>
+            <span>-<span class="text-success productprice" id="percAmount">{{percAmount}}</span></span>
           </li>
           <li class="list-group-item d-flex ">
             <span>Total</span>
-            <span class="ms-auto"><s class="productprice">{{oldTotal}}</s><strong class="productprice ms-2"> {{totalAmount}}</strong></span> 
+            <span class="ms-auto"><s class="productprice" id="oldTotal">{{oldTotal}}</s><strong class="productprice ms-2" id="mainTotal">{{totalAmount}}</strong></span> 
           </li>
         </ul>
 
-          <p class="fs-5 fw-bold text-success" id="couponMsg">{{couponName}}{{couponMsgGreen}}</p>
+          <p class="fs-5 fw-bold text-success couponMsgGreen" style="display: block;" id="couponMsg">
+            <span id="couponName">{{couponName}}</span>{{couponMsgGreen}}</p>
           <p class="fs-5 fw-bold text-danger" id="couponMsg">{{couponMsgRed}}{{notApplicable}}</p>
           <div class="input-group">
             <input type="text" class="form-control" id="couponInput"  placeholder="Coupon">
             <button class="btn btn-success" onclick="coupon()">Apply</button>
+            {{#if couponRemoveBtn}}<button class="btn btn-danger" style="display: inline-block;" onclick="couponRemove()" id="removeCoupon">Remove</button>{{/if}}
           </div>
 
         <ul class="list-group mb-3 mt-4">
-          
-
           {{#each coupon}}
           <li class="list-group-item d-flex justify-content-center lh-sm">
             <div>
@@ -51,12 +51,7 @@
             
           </li>
           {{/each}}
-
-
         </ul>  
-
-
-
 
       </div>
       <div class="col-md-7 col-lg-8" >
@@ -70,7 +65,7 @@
           <label class="form-check-label" for="{{this.id}}" id="editdiv{{this.id}}">
             <div class="col-12  border border-1  p-2 bg-white">
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="addressRadio" onclick="radioFun()" id="{{this.id}}" value="{{this.id}}" checked>
+                <input class="form-check-input" type="radio" name="addressRadio" id="{{this.id}}" value="{{this.id}}" checked>
                 <p ><span class="fs-6 fw-bold">{{this.name}}</span><span class="fs-6 fw-bold ms-4">{{this.mobile}}</span>
                 <button class="btn float-right fs-5 ms-5 Btns" onclick="editUp('{{this.id}}')" ><i class="fa-solid fa-pen-to-square"></i></button>
                   <button class="btn float-right fs-5 Btns" onclick="removeAddress('{{this.id}}','{{this.name}}')"><i class="fa fa-trash" aria-hidden="true"></i></button>
@@ -317,6 +312,36 @@
           }
         })
       }
+      function couponRemove(){
+        let couponName=document.getElementById('couponName').innerHTML
+        Swal.fire({
+        title: 'Are you want to remove Coupon - '+couponName,
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+             $.ajax({
+              url:'/removeCoupon',
+              data:{},
+              method:'post',
+              success:(response)=>{
+                document.getElementsByClassName('couponMsgGreen')[0].style.display="none"
+                let oldTotal=document.getElementById('oldTotal').innerHTML
+                document.getElementById('oldTotal').innerHTML=0
+                console.log(oldTotal)
+                document.getElementById('mainTotal').innerHTML=oldTotal
+                document.getElementById('percAmount').innerHTML=0
+                document.getElementById('removeCoupon').style.display="none"
+              }
+            })
+          }else{   
+          }
+        })
+      }
       function removeAddress(addressId,name){
       Swal.fire({
         title: 'Are you want to delete '+name,
@@ -341,7 +366,7 @@
       }else{   
       }
     })
-}
+    }
     
     document.getElementById("mainbutton").disabled = true;
     function addressup(){
