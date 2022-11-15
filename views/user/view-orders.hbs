@@ -121,7 +121,6 @@ function orderReturn(orderId,orderTotal){
     console.log(response)
     document.getElementById(orderId).innerHTML="Returned"
      
-
     for(let i=0;i< statusValue.length ;i++){
       if(statusValue[i].innerHTML==="Returned"){
         returnBtn[i].style.display="none"
@@ -169,13 +168,24 @@ function orderCancel(orderId,orderTotal){
             cancelBtn[i].style.display="none"
           } 
         }
-         Swal.fire({
+        if(response.cod){
+            Swal.fire({
+            position: 'inherit',
+            icon: 'success',
+            title: 'Order cancelled',
+            showConfirmButton: false,
+            timer: 1500
+            })
+        }else{
+            Swal.fire({
             position: 'inherit',
             icon: 'success',
             title: 'Cash successfully refunded to your wallet',
             showConfirmButton: false,
             timer: 1500
-        })
+            })
+        }
+        
         }
       })
   }else{

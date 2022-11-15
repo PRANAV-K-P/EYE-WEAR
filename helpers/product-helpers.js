@@ -8,14 +8,14 @@ module.exports={
         product.price=parseInt(product.price)
         product.stock=parseInt(product.stock)
         return new Promise(async(resolve,reject)=>{
-            let productData=await db.get().collection("products").findOne({model:product.model})
+            let productData=await db.get().collection(collection.PRODUCT_COLLECTION).findOne({model:product.model})
             if(productData){
                 productData.exist=true
                 resolve(productData)
             }else{
                 try{
                     product.mrp=product.price
-                    db.get().collection("products").insertOne(product).then((data)=>{
+                    db.get().collection(collection.PRODUCT_COLLECTION).insertOne(product).then((data)=>{
                     resolve(data.insertedId)
                     })
                 }catch(e){
@@ -29,7 +29,7 @@ module.exports={
     deleteProduct:(proId)=>{
         return new Promise((resolve,reject)=>{
             try{
-                db.get().collection("products").deleteOne({_id:ObjectId(proId)}).then(()=>{
+                db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id:ObjectId(proId)}).then(()=>{
                     resolve({something:true})
                 })
             }catch(e){
@@ -40,7 +40,7 @@ module.exports={
     },
     getProductDetails:(productId)=>{
         return new Promise(async(resolve,reject)=>{
-           db.get().collection("products").findOne({_id:ObjectId(productId)}).then((product)=>{
+           db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:ObjectId(productId)}).then((product)=>{
                 resolve(product)
             })
         })
@@ -50,7 +50,7 @@ module.exports={
         ProductDetails.stock=parseInt(ProductDetails.stock)
         return new Promise((resolve,reject)=>{
             try{
-                db.get().collection("products")
+                db.get().collection(collection.PRODUCT_COLLECTION)
                 .updateOne({_id:ObjectId(proId)},{
                     $set:{
                         model:ProductDetails.model,
@@ -74,7 +74,7 @@ module.exports={
     },
     getAllCategory:()=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection("categories").find().toArray().then((category)=>{
+            db.get().collection(collection.CATEGORY_COLLECTION).find().toArray().then((category)=>{
                 try{
                     resolve(category.reverse())
                 }catch(e){
@@ -86,7 +86,7 @@ module.exports={
     },
     getProductsInCategory:(cate,skip,limit)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection("products").find({category:cate}).skip(skip).limit(limit).toArray().then((product)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).find({category:cate}).skip(skip).limit(limit).toArray().then((product)=>{
                 console.log(product)
                 resolve(product.reverse())
             })
@@ -97,13 +97,13 @@ module.exports={
             let categoryName=cat.category
             categoryName=categoryName.toLowerCase()
             cat.category=categoryName
-            let categoryData=await db.get().collection("categories").findOne({category:categoryName})
+            let categoryData=await db.get().collection(collection.CATEGORY_COLLECTION).findOne({category:categoryName})
             if(categoryData){
                 categoryData.exist=true
                 resolve(categoryData)
             }else{
                 try{
-                    db.get().collection("categories").insertOne(cat).then((data)=>{
+                    db.get().collection(collection.CATEGORY_COLLECTION).insertOne(cat).then((data)=>{
                         resolve(data)
                     })
                 }catch(e){
@@ -116,7 +116,7 @@ module.exports={
     deleteCategory:(cate)=>{
         return new Promise((resolve,reject)=>{
             try{
-                db.get().collection("categories").deleteOne({_id:ObjectId(cate)}).then(()=>{
+                db.get().collection(collection.CATEGORY_COLLECTION).deleteOne({_id:ObjectId(cate)}).then(()=>{
                     resolve({something:true})
                 })
             }catch(e){
@@ -128,13 +128,13 @@ module.exports={
     updateCategory:(cate,cateData)=>{
         return new Promise(async(resolve,reject)=>{
             cateData.category=cateData.category.toLowerCase()
-            let categoryData=await db.get().collection("categories").findOne({category:cateData.category})
+            let categoryData=await db.get().collection(collection.CATEGORY_COLLECTION).findOne({category:cateData.category})
             if(categoryData){
                 categoryData.exist=true
                 resolve(categoryData)
             }else{
                 try{
-                    db.get().collection("categories").updateOne({category:cate},{
+                    db.get().collection(collection.CATEGORY_COLLECTION).updateOne({category:cate},{
                         $set:{
                             category:cateData.category
                         }
@@ -151,7 +151,7 @@ module.exports={
     categoryInProduct:(cate,cateData)=>{
         return new Promise((resolve,reject)=>{
             try{
-                db.get().collection("products").updateMany({category:cate},{
+                db.get().collection(collection.PRODUCT_COLLECTION).updateMany({category:cate},{
                     $set:{
                         category:cateData.category
                     }
@@ -166,19 +166,19 @@ module.exports={
     },
     fetchImage1:(proId)=>{
         return new Promise(async(resolve,reject)=>{
-            let detail=await db.get().collection("products").findOne({_id:ObjectId(proId)},{projection: { image1: true }})
+            let detail=await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:ObjectId(proId)},{projection: { image1: true }})
             resolve(detail.image1)
         })
     },
     fetchImage2:(proId)=>{
         return new Promise(async(resolve,reject)=>{
-            let detail=await db.get().collection("products").findOne({_id:ObjectId(proId)},{projection: { image2: true }})
+            let detail=await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:ObjectId(proId)},{projection: { image2: true }})
             resolve(detail.image2)
         })
     },
     checkProductCategory:(Category)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection("products").find({category:Category}).toArray().then((checkProduct)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).find({category:Category}).toArray().then((checkProduct)=>{
                 if(checkProduct.length!=0){
                     resolve({stopCategoryDelete:true})
                  }else{
@@ -190,7 +190,7 @@ module.exports={
     },
     searchInProducts:(key)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection("products").find(
+            db.get().collection(collection.PRODUCT_COLLECTION).find(
                 {
                     "$or":[
                         {brand:{$regex: key, $options: 'i'}},
@@ -205,19 +205,19 @@ module.exports={
     },
     getProductCount:()=>{
         return new Promise(async (resolve, reject) => {
-            let count = await db.get().collection("products").countDocuments()
+            let count = await db.get().collection(collection.PRODUCT_COLLECTION).countDocuments()
             resolve(count)
         })
     },
     getPaginatedProducts: (skip, limit) => {
         return new Promise(async (resolve, reject) => {
-            let products = await db.get().collection("products").find().skip(skip).limit(limit).toArray()
+            let products = await db.get().collection(collection.PRODUCT_COLLECTION).find().skip(skip).limit(limit).toArray()
             resolve(products.reverse())
         })
     },
     getCategoryProductCount:(catName)=>{
         return new Promise(async (resolve, reject) => {
-            let procount = await db.get().collection("products").find({category:catName}).toArray()
+            let procount = await db.get().collection(collection.PRODUCT_COLLECTION).find({category:catName}).toArray()
             count=procount.length
             console.log(count);
             resolve(count)

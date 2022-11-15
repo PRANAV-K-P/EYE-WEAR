@@ -579,9 +579,13 @@ router.post('/order-return',(req,res)=>{
   userHelper.returnOrder(req.body,userId).then(async(response)=>{
     let data={}
     data.returnTrue=true
-    await userHelper.refundAmount(userId,req.body,data)
-    data.returnTrue=false
-    res.json(response)
+    await userHelper.refundAmount(userId,req.body,data).then((data)=>{
+      data.returnTrue=false
+      res.json(response)
+    })
+    .catch(()=>{
+      res.redirect('/error',{log:true})
+    })
   })
 })
 router.post('/order-cancel',(req,res)=>{
@@ -589,9 +593,18 @@ router.post('/order-cancel',(req,res)=>{
   userHelper.cancelOrder(req.body).then(async(response)=>{
     let data={}
     data.cancelTrue=true
-    await userHelper.refundAmount(userId,req.body,data)
-    data.cancelTrue=false
-    res.json(response)
+    await userHelper.refundAmount(userId,req.body,data).then((detail)=>{
+      if(detail.cod){
+        response.cod=true
+      }else{
+        response.cod=false
+      }
+      data.cancelTrue=false
+      res.json(response)
+    })
+    .catch(()=>{
+      res.redirect('/error',{log:true})
+    })
   })
 })
 router.post('/verify-payment',(req,res)=>{
