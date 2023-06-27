@@ -1,7 +1,6 @@
 var db=require('../config/connection')
 var collection=require('../config/collections')
 const { log } = require('handlebars')
-// const { response } = require('../app')
 var ObjectId=require('mongodb').ObjectId
 module.exports={
     addProduct:(product)=>{

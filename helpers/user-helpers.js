@@ -2,21 +2,17 @@ var db=require('../config/connection')
 var collection=require('../config/collections')
 const bcrypt=require('bcrypt') 
 const { CpsContext } = require('twilio/lib/rest/preview/trusted_comms/cps')
-const { response } = require('../app')
 var ObjectId=require('mongodb').ObjectId
 var {uid} = require('uid')
 let referralCodeGenerator = require('referral-code-generator')
 const Razorpay=require('razorpay')
 var paypal = require('paypal-rest-sdk');
 const { AccessTokenInstance } = require('twilio/lib/rest/verify/v2/service/accessToken')
-const { statSync } = require('node:fs')
-const { resolve } = require('node:path')
 require('dotenv').config()
 var instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
   });
-
 
 module.exports={
     doSignup:(user)=>{
